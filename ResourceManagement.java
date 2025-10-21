@@ -109,6 +109,30 @@ public class ResourceManagement
    * Print a summary of what each department received and did not receive
    */    
   private void printSummaryOfDistribution(  ){
+    System.out.println("SUMMARY OF ITEMS RECEIVED AND NOT RECEIVED");
+
+    for(Department dept : departmentPQ){
+      System.out.println(dept.name);
+        System.out.printf("Total Spent = $%.2f\n", dept.priority);
+        double percent = (dept.priority / budget) * 100;
+        System.out.printf("Percent of Budget = %.2f%%\n", percent);
+        System.out.println("----------------------------");
+
+
+      System.out.println("ITEMS RECEIVED");
+      for(Item item : dept.itemsReceived){
+        String price = String.format("$%.2f", item.price);
+        System.out.printf("%-30s - %30s\n", item.name, price);
+      }
+
+      System.out.println("ITEMS NOT RECEIVED");
+      for(Item item : dept.itemsRemoved){
+        String price = String.format("$%.2f", item.price);
+        System.out.printf("%-30s - %30s\n", item.name, price);
+      }
+
+      System.out.println();
+    }
 
   } 
 }
