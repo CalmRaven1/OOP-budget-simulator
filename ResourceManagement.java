@@ -130,7 +130,31 @@ class Department implements Comparable<Department>
    */
   public Department( String fileName ){
     /* Open the fileName, create items based on the contents, and add those items to itemsDesired */
+    File file = new File(fileName);
+    Scanner input;
+    try{
+      input = new Scanner(file);
+      this.name = input.nextLine();
+      this.priority = 0.0;
 
+      this.itemsDesired = new LinkedList<>();
+      this.itemsReceived = new LinkedList<>();
+      this.itemsRemoved = new LinkedList<>();
+
+      while(input.hasNext()){
+        String itemsNeeded = input.next();
+        if(!input.hasNextDouble()){
+            break;
+        }
+        double priceOfItem = input.nextDouble();
+        itemsDesired.add(new Item(itemsNeeded, priceOfItem));
+      }
+      input.close();
+    }catch(Exception e){
+      e.printStackTrace();
+      System.err.println("The file" +fileName+ "was not found");
+      return;
+    }
   }
     
   /*
