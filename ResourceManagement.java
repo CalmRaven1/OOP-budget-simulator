@@ -8,8 +8,8 @@ import java.util.*;
 public class ResourceManagement
 {
     private PriorityQueue<Department> departmentPQ; /* priority queue of departments */
-    private Double remainingBudget;                 /* the budget left after purchases are made (should be 0 after the constructor runs) */
-    private Double budget;
+    private Double remainingBudget = 0.0;;                 /* the budget left after purchases are made (should be 0 after the constructor runs) */
+    private Double budget = 0.0;
     /* TO BE COMPLETED BY YOU
    * Fill in your name in the function below
    */  
@@ -84,17 +84,20 @@ public class ResourceManagement
           dept.itemsReceived.add(scholarShipItem);
           dept.priority = dept.priority + scholarship;
           remainingBudget = remainingBudget - scholarship;
+
+          String price = String.format("$%.2f", scholarShipItem.price);
+          System.out.printf("Department of %-30s - %-30s - %30s\n", dept.name, scholarShipItem.name, price);
         }
-        System.out.printf("%-40s - %-30s - $%10.2f", "Department of " + dept.name, scholarShipItem.name, scholarShipItem.price);
       } else{
           purchasedItem = dept.itemsDesired.poll();
           dept.itemsReceived.add(purchasedItem);
           dept.priority = dept.priority + purchasedItem.price;
           remainingBudget = remainingBudget - purchasedItem.price;
 
-          System.out.printf("%-40s - %-30s - $%10.2f", "Department of " + dept.name, purchasedItem.name, purchasedItem.price);
-
+          String price = String.format("$%.2f", purchasedItem.price);
+          System.out.printf("Department of %-30s - %-30s - %30s\n", dept.name, purchasedItem.name, price);
       }
+      
 
       if(!dept.itemsDesired.isEmpty()){
         departmentPQ.add(dept);
@@ -109,7 +112,30 @@ public class ResourceManagement
    * Print a summary of what each department received and did not receive
    */    
   private void printSummaryOfDistribution(  ){
+    System.out.println("SUMMARY OF ITEMS RECEIVED AND NOT RECEIVED");
 
+    for(Department dept : departmentPQ){
+      System.out.println(dept.name);
+        System.out.printf("Total Spent = $%.2f\n", dept.priority);
+        double percent = (dept.priority / budget) * 100;
+        System.out.printf("Percent of Budget = %.2f%%\n", percent);
+        System.out.println("----------------------------");
+
+
+      System.out.println("ITEMS RECEIVED");
+      for(Item item : dept.itemsReceived){
+        String price = String.format("$%.2f", item.price);
+        System.out.printf("%-30s - %30s\n", item.name, price);
+      }
+
+      System.out.println("ITEMS NOT RECEIVED");
+      for(Item item : dept.itemsRemoved){
+        String price = String.format("$%.2f", item.price);
+        System.out.printf("%-30s - %30s\n", item.name, price);
+      }
+
+      System.out.println();
+    }
   } 
 }
 
@@ -120,7 +146,7 @@ public class ResourceManagement
 class Department implements Comparable<Department>
 {
   String name;                /* name of this department */
-  Double priority;            /* total money spent on this department */
+  Double priority = 0.0;            /* total money spent on this department */
   Queue<Item> itemsDesired;   /* list of items this department wants */
   Queue<Item> itemsReceived;  /* list of items this department received */
   Queue<Item> itemsRemoved;   /* list of items that were skipped because they exceeded the remaining budget */
@@ -142,17 +168,18 @@ class Department implements Comparable<Department>
       this.itemsRemoved = new LinkedList<>();
 
       while(input.hasNext()){
-        String itemsNeeded = input.next();
+        String ItemNeeded = input.next();
         if(!input.hasNextDouble()){
-            break;
+          break;
         }
         double priceOfItem = input.nextDouble();
-        itemsDesired.add(new Item(itemsNeeded, priceOfItem));
+        itemsDesired.add(new Item(ItemNeeded, priceOfItem));
       }
+
       input.close();
-    }catch(Exception e){
+    } catch(Exception e){
       e.printStackTrace();
-      System.err.println("The file" +fileName+ "was not found");
+      System.out.println("The file" + fileName + "was not found");
       return;
     }
   }
@@ -204,7 +231,7 @@ class Department implements Comparable<Department>
 class Item
 {
   String name;    /* name of this item */
-  Double price;   /* price of this item */
+  Double price = 0.0;   /* price of this item */
 
   /*
    * Constructor to build a Item
