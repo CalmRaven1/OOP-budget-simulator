@@ -146,7 +146,7 @@ public class ResourceManagement
 class Department implements Comparable<Department>
 {
   String name;                /* name of this department */
-  Double priority = 0.0;            /* total money spent on this department */
+  Double priority;          /* total money spent on this department */
   Queue<Item> itemsDesired;   /* list of items this department wants */
   Queue<Item> itemsReceived;  /* list of items this department received */
   Queue<Item> itemsRemoved;   /* list of items that were skipped because they exceeded the remaining budget */
