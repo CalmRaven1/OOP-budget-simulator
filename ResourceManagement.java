@@ -8,8 +8,8 @@ import java.util.*;
 public class ResourceManagement
 {
     private PriorityQueue<Department> departmentPQ; /* priority queue of departments */
-    private Double remainingBudget = 0.0;;                 /* the budget left after purchases are made (should be 0 after the constructor runs) */
-    private Double budget = 0.0;
+    private Double remainingBudget;                 /* the budget left after purchases are made (should be 0 after the constructor runs) */
+    private Double budget;
     /* TO BE COMPLETED BY YOU
    * Fill in your name in the function below
    */  
@@ -31,6 +31,7 @@ public class ResourceManagement
     /* Create a department for each file listed in fileNames */
     departmentPQ = new PriorityQueue<>();
     this.remainingBudget = budget;
+    this.budget = budget;
 
       for ( String filename : fileNames) {
         Department dept = new Department(filename);
@@ -58,11 +59,52 @@ public class ResourceManagement
    * Executes the budget distribution algorithm and prints a record of which items were purchased
    */    
   private void allocateBudget(  ){
+     System.out.println("----------------------------TESTING with budget = $" + String.format("%.2f", budget) + "----------------------------");
+    System.out.println("\nITEMS PURCHASED");
+    System.out.println("----------------------------");
+
+    Item purchasedItem;
+    Item scholarshipItem;
+    
+    while (!departmentPQ.isEmpty() && remainingBudget > 0) {
+        Department dept = departmentPQ.poll();
+
+        // Remove items that exceed remaining budget
+        while (!dept.itemsDesired.isEmpty() && dept.itemsDesired.peek().price > remainingBudget) {
+            dept.itemsRemoved.add(dept.itemsDesired.poll());
+        }
+
+        // If no items left, try to add scholarship
+        if (dept.itemsDesired.isEmpty()) {
+            double scholarship = Math.min(remainingBudget, 1000.0);
+            if (scholarship > 0) {
+                scholarshipItem = new Item("Scholarship", scholarship);
+                dept.itemsReceived.add(scholarshipItem);
+                dept.priority += scholarship;
+                remainingBudget -= scholarship;
+                System.out.printf("Department of %-40s - %-30s - %30s%n", dept.name, scholarshipItem.name, "$" + String.format("%.2f", scholarshipItem.price));
+            }
+        } else { // Purchase the next item
+            purchasedItem = dept.itemsDesired.poll();
+            dept.itemsReceived.add(purchasedItem);
+            dept.priority += purchasedItem.price;
+            remainingBudget -= purchasedItem.price;
+            System.out.printf("Department of %-40s - %-30s - %30s%n", dept.name, purchasedItem.name, "$" + String.format("%.2f", purchasedItem.price));
+        }
+
+        // Re-add dept if it still has items left
+        if (!dept.itemsDesired.isEmpty()) {
+            departmentPQ.add(dept);
+        }
+    }
+
+    System.out.println("\nBudget allocation complete!\n");
+  }
     /* Simulate the algorithm for picking the items to purchase */
     /* Print a record of each item as they are purchased (see PDF and sample output for example tables) */
-    double scholarship;
-    Item scholarShipItem = null;
-    Item purchasedItem = null;
+    /*double scholarship;
+    Item scholarShipItem;
+    Item purchasedItem;
     System.out.println("ITEMS PURCHASED");
     System.out.println("----------------------------");
     while(!departmentPQ.isEmpty() && remainingBudget > 0){
@@ -105,13 +147,46 @@ public class ResourceManagement
     }
     
     System.out.println("\nBudget allocation complete!");
-  } 
+  }
 
-  /* printSummaryOfDistribution
+  /* printSummaryOfDistributionclear
+
    * TODO
    * Print a summary of what each department received and did not receive
-   */    
-  private void printSummaryOfDistribution(  ){
+   */   
+  private void printSummaryOfDistribution() {
+    ArrayList<Department> allDepartments = new ArrayList<>(departmentPQ);
+    allDepartments.sort(Comparator.comparing(d -> d.name));
+
+    for (Department dept : allDepartments) {
+        System.out.println("Department of " + dept.name);
+        System.out.println("Total Spent       = $" + String.format("%.2f", dept.priority));
+        double percent = (dept.priority / budget) * 100;
+        System.out.println("Percent of Budget = " + String.format("%.2f", percent) + "%");
+        System.out.println("----------------------------");
+
+        // Items Received
+        if (!dept.itemsReceived.isEmpty()) {
+            System.out.println("ITEMS RECEIVED");
+            for (Item item : dept.itemsReceived) {
+                System.out.printf("%-30s - %30s%n", item.name, "$" + String.format("%.2f", item.price));
+            }
+            System.out.println();
+        }
+
+        // Items Not Received
+        if (!dept.itemsRemoved.isEmpty()) {
+            System.out.println("ITEMS NOT RECEIVED");
+            for (Item item : dept.itemsRemoved) {
+                System.out.printf("%-30s - %30s%n", item.name, "$" + String.format("%.2f", item.price));
+            }
+            System.out.println();
+        }
+    }
+}
+   
+
+  /*private void printSummaryOfDistribution(  ){
     System.out.println("SUMMARY OF ITEMS RECEIVED AND NOT RECEIVED");
 
     for(Department dept : departmentPQ){
